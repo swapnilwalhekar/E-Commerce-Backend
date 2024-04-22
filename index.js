@@ -38,10 +38,10 @@ app.post("/login", async (req, resp) => {
         resp.send({ user, auth: token });
       });
     } else {
-      resp.send({ result: "No User found" });
+      resp.send({ result: "No User found, Please enter valid email and password" });
     }
   } else {
-    resp.send({ result: "No User found" });
+    resp.send({ result: "Please enter valid email and password" });
   }
 });
 
@@ -63,32 +63,24 @@ app.get("/products", async (req, resp) => {
 app.delete("/product/:id", async (req, resp) => {
   let result = await Product.deleteOne({ _id: req.params.id });
   resp.send(result);
-}),
-  app.get("/product/:id", async (req, resp) => {
-    let result = await Product.findOne({ _id: req.params.id });
-    if (result) {
-      resp.send(result);
-    } else {
-      resp.send({ result: "No Record Found." });
-    }
-  });
+});
+
+app.get("/product/:id", async (req, resp) => {
+  let result = await Product.findOne({ _id: req.params.id });
+  if (result) {
+    resp.send(result);
+  } else {
+    resp.send({ result: "No Record Found." });
+  }
+});
 
 app.put("/product/:id", async (req, resp) => {
-  console.log("ok backed id:", req.params.id);
   let result = await Product.updateOne(
     { _id: req.params.id },
     { $set: req.body }
   );
   resp.send(result);
 });
-
-// app.put("/product/:id", async (req, resp) => {
-//   let result = await Product.updateOne(
-//     { _id: req.params.id },
-//     { $set: req.body }
-//   );
-//   resp.send(result);
-// });
 
 app.get("/search/:key", async (req, resp) => {
   let result = await Product.find({
@@ -100,6 +92,9 @@ app.get("/search/:key", async (req, resp) => {
         company: { $regex: req.params.key },
       },
       {
+        price: { $regex: req.params.key },
+      },
+      {
         category: { $regex: req.params.key },
       },
     ],
@@ -107,4 +102,7 @@ app.get("/search/:key", async (req, resp) => {
   resp.send(result);
 });
 
-app.listen(9000);
+const port = 9000;
+app.listen(port, () => {
+  console.log('Server is running on port:', port)
+});
